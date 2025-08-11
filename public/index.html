@@ -1,0 +1,68 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CoinStorm</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <style>
+    :root { --primary:#6c5ce7; --secondary:#a29bfe; --accent:#00cec9; --light:#f5f6fa; }
+    body{font-family:'Poppins',sans-serif;background:linear-gradient(135deg,var(--primary),var(--secondary));color:var(--light);margin:0;padding:0;min-height:100vh;overflow-x:hidden;}
+    .container{max-width:900px;margin:0 auto;padding:20px;text-align:center;}
+    .ad-section{margin:20px 0;}
+    .sticky-banner{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);z-index:9999;background:transparent;}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>CoinStorm (Sample)</h1>
+    <p>This demo uses the server-side verification flow. Open developer console to see session info.</p>
+    <button id="start-ad">Watch Ad (+10 coins)</button>
+    <div id="status"></div>
+
+    <div class="ad-section" id="native-ad">
+      <!-- Native widget will be injected based on config -->
+    </div>
+
+    <div class="sticky-banner" id="sticky-banner"></div>
+  </div>
+
+  <script>
+    async function fetchConfig() {
+      const r = await fetch('/config.json');
+      return r.json();
+    }
+    (async ()=>{
+      const cfg = await fetchConfig();
+      document.getElementById('status').innerText = 'Loaded config. Direct links: ' + cfg.ads.direct_links.length;
+      // inject native widget if enabled
+      if (cfg.ads.native_widget && cfg.ads.native_widget.enabled) {
+        const s = document.createElement('script');
+        s.async = true;
+        s.src = cfg.ads.native_widget.script;
+        document.getElementById('native-ad').appendChild(s);
+        const cont = document.createElement('div');
+        cont.id = cfg.ads.native_widget.container_id;
+        document.getElementById('native-ad').appendChild(cont);
+      }
+      // load popunder once
+      if (cfg.ads.popunder && cfg.ads.popunder.enabled) {
+        const p = document.createElement('script');
+        p.async = true;
+        p.src = cfg.ads.popunder.script;
+        document.body.appendChild(p);
+      }
+      // sticky banner invoke script
+      if (cfg.ads.sticky_320x50 && cfg.ads.sticky_320x50.enabled) {
+        const s = document.createElement('script');
+        s.src = cfg.ads.sticky_320x50.invoke_script;
+        document.getElementById('sticky-banner').appendChild(s);
+      }
+      // store config for UI code usage
+      window.__COINSTORM_CONFIG = cfg;
+    })();
+  </script>
+</body>
+</html>
