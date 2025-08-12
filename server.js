@@ -227,7 +227,7 @@ app.post('/api/admin/create-code', async (req, res) => {
   res.json({ ok: true, created });
 });
 
-const PORT = process.env.PORT || config.server.port || 3001;
+const PORT = process.env.PORT || config.server.port || 3002;
 app.listen(PORT, () => {
   console.log(`CoinStorm server listening on ${PORT}`);
 });
