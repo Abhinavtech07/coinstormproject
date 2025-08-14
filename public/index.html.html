@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CoinStorm</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root { --primary:#6c5ce7; --secondary:#a29bfe; --accent:#00cec9; --light:#f5f6fa; }
+    body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: var(--light); }
+    .container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+    .ad-container { margin: 2rem 0; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <div class="container text-center">
+    <h1 class="mb-4">CoinStorm</h1>
+    
+    <div class="card mb-4">
+      <div class="card-body">
+        <h3>Your Balance: <span id="balance">0</span> coins</h3>
+        <button id="watchAd" class="btn btn-primary">Watch Ad (+10 coins)</button>
+      </div>
+    </div>
+
+    <div class="ad-container" id="nativeAd">
+      <!-- Native ad will load here -->
+    </div>
+
+    <div class="mt-4">
+      <a href="/admin.html" class="btn btn-outline-light">Admin Panel</a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Load config
+    async function loadConfig() {
+      const response = await fetch('/config.json')
+      return response.json()
+    }
+
+    // Get user balance from localStorage
+    function getBalance() {
+      return parseInt(localStorage.getItem('coinBalance')) || 0
+    }
+
+    // Update balance display
+    function updateBalance() {
+      document.getElementById('balance').textContent = getBalance()
+    }
+
+    // Initialize ads
+    function initAds(config) {
+      // Native ad
+      if (config.ads.native_widget?.enabled) {
+        const script = document.createElement('script')
+        script.src = config.ads.native_widget.script
+        document.getElementById('nativeAd').appendChild(script)
+        
+        const container = document.createElement('div')
+        container.id = config.ads.native_widget.container_id
+        document.getElementById('nativeAd').appendChild(container)
+      }
+    }
+
+    // Main function
+    (async function() {
+      const config = await loadConfig()
+      
+      // Initialize ads
+      initAds(config)
+      
+      // Set up event listeners
+      document.getElementById('watchAd').addEventListener('click', () => {
+        const newBalance = getBalance() + 10
+        localStorage.setItem('coinBalance', newBalance)
+        updateBalance()
+        alert('+10 coins added to your balance!')
+      })
+      
+      // Load initial balance
+      updateBalance()
+    })()
+  </script>
+</body>
+</html>
