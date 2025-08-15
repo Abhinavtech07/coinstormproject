@@ -1,43 +1,37 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>CoinStorm — Earn & Redeem</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CoinStorm — Earn & Redeem</title>
+  <meta name="description" content="Watch ads, earn coins, redeem rewards. Google Sign-in & Firestore backed." />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-<style>
+  <style>
   :root{
-    --navy: #071428;         /* deep navy background */
-    --card: rgba(255,255,255,0.98);
-    --glass: rgba(255,255,255,0.06);
-    --gold-1: #ffd166;
-    --gold-2: #ff9f1c;
-    --neon-1: #7c3aed;
-    --neon-2: #4f46e5;
-    --muted: #98a0b3;
-    --radius: 14px;
-    --maxw: 1120px;
+    --navy:#061025;
+    --card:#ffffff;
+    --muted:#98a0b3;
+    --gold-1:#ffd166;
+    --gold-2:#ff9f1c;
+    --neon-1:#7c3aed;
+    --neon-2:#4f46e5;
+    --radius:14px;
+    --maxw:1120px;
   }
   *{box-sizing:border-box}
-  html,body{height:100%;margin:0;font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial;color:#0b1220;background:linear-gradient(180deg,#f8fafc,#eef2ff)}
-  /* Outer brand header */
-  .topbar{
-    background: linear-gradient(90deg,var(--neon-2),#7c3aed);
-    color: #fff;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;
-    box-shadow:0 8px 30px rgba(45,37,120,0.12);
-  }
-  .brand .title{font-weight:800;font-size:20px}
-  .brand .sub{font-size:12px;opacity:.95}
+  html,body{height:100%;margin:0;font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial;color:#071028;background:linear-gradient(180deg,#f6f8fb,#eef4ff)}
+  .bg-blobs{position:fixed;inset:0;z-index:-2;pointer-events:none;background:
+    radial-gradient(800px 400px at 6% 8%, rgba(255,209,102,0.12), transparent 10%),
+    radial-gradient(700px 360px at 92% 24%, rgba(124,58,237,0.09), transparent 8%),
+    radial-gradient(900px 420px at 50% 92%, rgba(79,70,229,0.06), transparent 6%);filter:blur(22px);animation:bgFloat 18s linear infinite;}
+  @keyframes bgFloat{0%{transform:translateY(0)}50%{transform:translateY(8px)}100%{transform:translateY(0)}}
 
   .container{max-width:var(--maxw);margin:20px auto;padding:0 18px}
-
-  /* animated background blobs */
-  .bg-blobs{position:fixed;inset:0;z-index:-2;pointer-events:none;background:
-    radial-gradient(800px 400px at 10% 10%, rgba(255,209,102,0.12), transparent 10%),
-    radial-gradient(700px 360px at 90% 30%, rgba(124,58,237,0.09), transparent 8%),
-    radial-gradient(900px 420px at 50% 90%, rgba(79,70,229,0.06), transparent 6%);filter:blur(20px);animation:floatBG 18s linear infinite}
-  @keyframes floatBG{0%{transform:translateY(0)}50%{transform:translateY(8px)}100%{transform:translateY(0)}}
+  .topbar{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:12px;background:linear-gradient(90deg,var(--neon-2),var(--neon-1));color:#fff;box-shadow:0 10px 30px rgba(79,70,229,0.12)}
+  .brand .title{font-weight:800;font-size:20px}
+  .brand .sub{font-size:12px;opacity:.95}
+  .chip{background:rgba(255,255,255,0.12);padding:8px 12px;border-radius:999px;font-weight:700}
 
   .grid{display:grid;grid-template-columns:2fr 360px;gap:18px;align-items:start}
   @media(max-width:980px){.grid{grid-template-columns:1fr}}
@@ -47,8 +41,8 @@
 
   .coins-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
   .balance{display:flex;align-items:center;gap:14px}
-  .coin-badge{width:70px;height:70px;border-radius:16px;background:linear-gradient(135deg,var(--gold-1),var(--gold-2));display:grid;place-items:center;font-weight:900;font-size:28px;color:#2b1800;box-shadow:0 16px 40px rgba(255,160,30,0.12)}
-  .balance-value{font-size:36px;font-weight:800}
+  .coin-badge{width:68px;height:68px;border-radius:16px;background:linear-gradient(135deg,var(--gold-1),var(--gold-2));display:grid;place-items:center;font-weight:900;font-size:26px;color:#2b1800;box-shadow:0 16px 40px rgba(255,160,30,0.12)}
+  .balance-value{font-size:34px;font-weight:800}
   .actions{display:flex;gap:10px;flex-wrap:wrap}
 
   .btn{padding:10px 14px;border-radius:12px;border:0;cursor:pointer;font-weight:800}
@@ -59,17 +53,16 @@
   .pulse{animation:pulse 1.6s infinite}
   @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
 
-  .progress-wrap{margin-top:12px}
-  .progress-outer{height:14px;background:linear-gradient(90deg,#f4f6fb,#fff);border-radius:12px;padding:2px}
-  .progress-inner{height:100%;width:0;border-radius:10px;background:linear-gradient(90deg,var(--gold-2),var(--neon-2));position:relative;overflow:hidden;transition:width .7s cubic-bezier(.2,.9,.2,1)}
-  .progress-inner::after{content:"";position:absolute;left:-40%;top:0;width:40%;height:100%;background:linear-gradient(90deg,rgba(255,255,255,0.45),rgba(255,255,255,0.02));transform:skewX(-25deg);animation:shine 2.2s linear infinite}
+  .progress-wrap{margin-top:14px}
+  .progress-outer{height:16px;background:linear-gradient(90deg,#f4f6fb,#fff);border-radius:12px;padding:2px}
+  .progress-inner{height:100%;width:0;border-radius:10px;background:linear-gradient(90deg,var(--gold-2),var(--neon-2));position:relative;overflow:hidden;transition:width .8s cubic-bezier(.2,.9,.2,1)}
+  .progress-inner::after{content:"";position:absolute;left:-40%;top:0;width:40%;height:100%;background:linear-gradient(90deg,rgba(255,255,255,0.45),rgba(255,255,255,0.02));transform:skewX(-25deg);animation:shine 2s linear infinite}
   @keyframes shine{0%{left:-40%}100%{left:120%}}
 
   .ad-slot{border-radius:12px;padding:10px;background:linear-gradient(180deg,rgba(255,255,255,0.94),rgba(255,255,255,0.92));display:flex;align-items:center;justify-content:center;min-height:90px;border:1px solid rgba(15,20,40,0.03)}
   .ad-label{font-size:12px;color:var(--muted);margin-bottom:6px}
 
   .ads-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:12px}
-
   .rewards{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
   .reward{flex:0 0 150px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#fffdf7,#fff8ee);text-align:center;box-shadow:0 8px 22px rgba(255,160,30,0.06)}
   .reward .title{font-weight:800}
@@ -78,37 +71,46 @@
   .activity{margin-top:12px}
   .activity-item{background:#fff;padding:10px;border-radius:10px;margin-bottom:8px;border:1px solid #f2f0ef;font-size:13px}
 
-  .sticky{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;width:340px;border-radius:12px;overflow:hidden;z-index:9999}
-
   .fire{display:inline-block;width:18px;height:18px;border-radius:6px;background:linear-gradient(90deg,#ff6a00,#ffbf00);box-shadow:0 6px 18px rgba(255,120,20,0.12);margin-left:8px;animation:firebounce 1.6s infinite}
   @keyframes firebounce{0%{transform:translateY(0)}50%{transform:translateY(-4px)}100%{transform:translateY(0)}}
 
-  /* fade-in for elements */
   .fadein{animation:fadeIn .45s ease both}
   @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-</style>
+  .confetti{position:fixed;width:9px;height:9px;border-radius:2px;top:0;opacity:0.95;z-index:20000;pointer-events:none}
+  .preloader-wrap{position:fixed;inset:0;background:linear-gradient(180deg,rgba(6,20,40,0.85),rgba(6,14,26,0.7));display:flex;align-items:center;justify-content:center;z-index:99999;flex-direction:column;color:#fff}
+  .spinner-coin{width:96px;height:96px;border-radius:18px;background:conic-gradient(#ffd166,#ff9f1c,#7c3aed);display:grid;place-items:center;font-size:28px;box-shadow:0 20px 60px rgba(0,0,0,0.4);animation:spin 1.8s linear infinite}
+  @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+  .preloader-text{margin-top:12px;opacity:0.95}
+  </style>
 </head>
 <body>
   <div class="bg-blobs" aria-hidden="true"></div>
 
-  <header class="topbar">
+  <!-- Preloader -->
+  <div id="preloader" class="preloader-wrap" aria-hidden="false">
+    <div class="spinner-coin">💰</div>
+    <div class="preloader-text">CoinStorm is loading…</div>
+  </div>
+
+  <!-- Top bar -->
+  <header class="topbar" role="banner">
     <div class="brand">
       <div class="title">⚡ CoinStorm</div>
-      <div class="sub">Trusted rewards — Gold • Blue • Neon</div>
+      <div class="sub">Trusted rewards • Gold • Navy • Neon</div>
     </div>
     <div style="display:flex;align-items:center;gap:10px">
-      <div id="user-chip" class="muted" style="padding:8px 12px;background:transparent;border-radius:999px;color:#fff">Not signed in</div>
-      <button id="btn-signin" class="btn btn-primary">Sign in with Google</button>
+      <div id="user-chip" class="chip" style="color:#fff">Not signed in</div>
+      <button id="btn-signin" class="btn btn-primary">Sign in (Google)</button>
       <button id="btn-signout" class="btn btn-ghost" style="display:none">Sign out</button>
     </div>
   </header>
 
-  <main class="container">
-    <!-- top native ad -->
+  <main class="container" role="main">
+    <!-- Top native ad -->
     <section id="native-top" class="card ad-slot fadein">
-      <div style="text-align:center">
+      <div style="text-align:center;width:100%">
         <div class="ad-label">Sponsored</div>
-        <div id="native-top-container" style="margin-top:6px">Ad area</div>
+        <div id="native-top-container" style="margin-top:8px">Ad area</div>
       </div>
     </section>
 
@@ -123,10 +125,11 @@
                 <div id="coins" class="balance-value">0</div>
               </div>
             </div>
-
             <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-end">
               <div style="display:flex;align-items:center;gap:10px">
-                <div class="muted">Streak</div><div id="streak-count" style="font-weight:900">0</div><div class="fire" title="Daily Streak"></div>
+                <div class="muted">Streak</div>
+                <div id="streak-count" style="font-weight:900">0</div>
+                <div class="fire" title="Daily Streak"></div>
               </div>
               <div class="actions">
                 <button id="btn-watch" class="btn btn-primary pulse">▶ Watch Ad (+10)</button>
@@ -153,19 +156,19 @@
           <div class="rewards">
             <div class="reward" data-id="gp10" data-cost="500">
               <div class="title">Google Play ₹10</div>
-              <div class="cost muted">Cost: 500</div>
+              <div class="cost muted">Cost: 500 coins</div>
               <button class="btn btn-primary redeem-btn" style="margin-top:8px">Redeem</button>
               <div class="code muted" style="margin-top:8px;display:none"></div>
             </div>
             <div class="reward" data-id="am50" data-cost="2500">
               <div class="title">Amazon ₹50</div>
-              <div class="cost muted">Cost: 2500</div>
+              <div class="cost muted">Cost: 2500 coins</div>
               <button class="btn btn-primary redeem-btn" style="margin-top:8px">Redeem</button>
               <div class="code muted" style="margin-top:8px;display:none"></div>
             </div>
             <div class="reward" data-id="pp200" data-cost="10000">
               <div class="title">PayPal ₹200</div>
-              <div class="cost muted">Cost: 10000</div>
+              <div class="cost muted">Cost: 10000 coins</div>
               <button class="btn btn-primary redeem-btn" style="margin-top:8px">Redeem</button>
               <div class="code muted" style="margin-top:8px;display:none"></div>
             </div>
@@ -214,27 +217,32 @@
 
   <div id="sticky" class="sticky"></div>
 
-  <!-- Firebase compat SDKs (easy drop-in) -->
+  <!-- Firebase compat SDKs (drop-in) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <script>
-  // ------------------ CONFIG: replace these with your Firebase values ------------------
+  // ------------------ YOUR FIREBASE CONFIG (provided) ------------------
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyA7qDhpWxGQKgRGMK7MGjT2MBZF1EAGfLI",
+    authDomain: "netlify-a7bd7.firebaseapp.com",
+    projectId: "netlify-a7bd7",
+    storageBucket: "netlify-a7bd7.firebasestorage.app",
+    messagingSenderId: "241532446970",
+    appId: "1:241532446970:web:f5698380d476fdd8044143",
+    measurementId: "G-CCL8SEG1Q3"
   };
-  // ---------------------------------------------------------------------------------------
+
+  // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
+  // ---------------------------------------------------------------------
 
   // DOM refs
+  const preloader = document.getElementById('preloader');
   const userChip = document.getElementById('user-chip');
   const btnSignIn = document.getElementById('btn-signin');
   const btnSignOut = document.getElementById('btn-signout');
@@ -255,7 +263,7 @@
   const redeemBtns = document.querySelectorAll('.redeem-btn');
   document.getElementById('year').textContent = new Date().getFullYear();
 
-  // Ad & offer links
+  // direct offers
   const DIRECTS = [
     'https://www.profitableratecpm.com/hte0hzu0v?key=fb45638729e3933cb3d3e10867a09592',
     'https://www.profitableratecpm.com/i63pbecy1?key=6ca31a0952a0956430a016a37ca0fd57',
@@ -265,27 +273,33 @@
   document.getElementById('offer-2').href = DIRECTS[1];
   document.getElementById('offer-3').href = DIRECTS[2];
 
-  // app constants
+  // constants
   const COINS_PER_AD = 10;
-  const COOLDOWN = 30 * 1000;
-  const AD_VIEW_MS = 20 * 1000;
+  const COOLDOWN = 30 * 1000; // 30s
+  const AD_VIEW_MS = 20 * 1000; // 20s simulated
   const DAILY_LIMIT = 50;
 
   let currentUser = null;
   let userUnsub = null;
 
+  // small helper to show activity
   function pushActivity(text){
     const el = document.createElement('div'); el.className='activity-item';
     el.innerHTML = `<div style="font-weight:700">${text}</div><div class="muted" style="margin-top:6px;font-size:12px">${new Date().toLocaleString()}</div>`;
     activityList.prepend(el);
   }
 
-  // Sign in / out
-  btnSignIn.addEventListener('click', ()=> {
+  // remove preloader when ready
+  function hidePreloader() {
+    preloader.style.display = 'none';
+  }
+
+  // Sign-in/out
+  btnSignIn.addEventListener('click', () => {
     const provider = new firebase.auth.GoogleAuthProvider();
     auth.signInWithPopup(provider).catch(e => alert('Sign in failed: '+e.message));
   });
-  btnSignOut.addEventListener('click', ()=> auth.signOut());
+  btnSignOut.addEventListener('click', () => auth.signOut());
 
   auth.onAuthStateChanged(async user => {
     if (user) {
@@ -300,6 +314,8 @@
       if (userUnsub) { userUnsub(); userUnsub = null; }
       applyUI({ coins: 0, streakCount: 0 });
     }
+    // hide preloader when firebase auth settled
+    hidePreloader();
   });
 
   async function startUserListener(uid){
@@ -309,19 +325,20 @@
       await ref.set({ coins:0, lastAd:0, dailyCount:0, streakCount:0, lastClaim:null, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
     }
     userUnsub = ref.onSnapshot(snap => {
-      const data = snap.data(); if (!data) return;
+      const data = snap.data();
+      if (!data) return;
       applyUI(data);
     });
   }
 
-  function applyUI(data){
+  function applyUI(data) {
     coinsEl.textContent = data.coins || 0;
     streakCountEl.textContent = data.streakCount || 0;
     streakSide.textContent = data.streakCount || 0;
-    updateLevel(data.coins || 0);
+    updateLevelUI(data.coins || 0);
   }
 
-  function updateLevel(coins){
+  function updateLevelUI(coins) {
     const lvl = Math.floor((coins||0)/100) + 1;
     const prog = (coins||0) % 100;
     levelEl.textContent = lvl;
@@ -331,34 +348,45 @@
     if (lvl > last) { localStorage.setItem('cs_lastLevel', lvl); levelUp(); }
   }
 
-  function levelUp(){
+  function levelUp() {
     for (let i=0;i<60;i++){
       const c = document.createElement('div'); c.className='confetti';
-      c.style.left = (Math.random()*100) + '%';
+      c.style.left = (Math.random()*100)+'%';
       c.style.background = `hsl(${Math.random()*360} 85% 60%)`;
-      c.style.animationDuration = (1.2 + Math.random()*1.6) + 's';
+      c.style.animationDuration = (1.2 + Math.random()*1.6)+'s';
       document.body.appendChild(c); setTimeout(()=>c.remove(), 3000);
     }
     try { new Audio('https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3').play().catch(()=>{}); } catch(e){}
   }
 
-  // Watch ad flow — popunder + transaction
+  // watch ad flow + popunder-once-per-session
   document.getElementById('btn-watch').addEventListener('click', async () => {
     if (!currentUser) { alert('Sign in first'); return; }
-    const popup = window.open(DIRECTS[Math.floor(Math.random()*DIRECTS.length)], '_blank');
-    if (!popup) { alert('Allow popups to view offers'); return; }
 
+    // popunder only once per session
+    if (!sessionStorage.getItem('cs_popunder_shown')) {
+      // open popunder in new tab/window (browser permitting)
+      const pop = window.open('https://www.profitableratecpm.com/hte0hzu0v?key=fb45638729e3933cb3d3e10867a09592', '_blank');
+      if (!pop) alert('Please allow popups for the offer to open.');
+      sessionStorage.setItem('cs_popunder_shown','1');
+    } else {
+      // open random direct offer anyway (non-popunder)
+      window.open(DIRECTS[Math.floor(Math.random()*DIRECTS.length)], '_blank');
+    }
+
+    // UI countdown
     const btn = document.getElementById('btn-watch'); btn.disabled = true;
     const orig = btn.textContent; let left = AD_VIEW_MS/1000;
-    const timer = setInterval(()=>{ left--; btn.textContent = `Watching ${left}s`; if (left<=0){ clearInterval(timer); btn.textContent = orig; btn.disabled = false; } },1000);
+    const timer = setInterval(()=>{ left--; btn.textContent = `Watching ${left}s`; if (left<=0){ clearInterval(timer); btn.textContent = orig; btn.disabled = false; } }, 1000);
 
+    // after simulated view, award coins via Firestore transaction
     setTimeout(async () => {
       try {
-        const res = await db.runTransaction(async tx => {
+        const result = await db.runTransaction(async tx => {
           const ref = db.collection('users').doc(currentUser.uid);
-          const s = await tx.get(ref);
-          if (!s.exists) throw new Error('User missing');
-          const data = s.data();
+          const snap = await tx.get(ref);
+          if (!snap.exists) throw new Error('User missing');
+          const data = snap.data();
           const now = Date.now();
           if ((now - (data.lastAd || 0)) < COOLDOWN) throw { code:'COOLDOWN', wait: Math.ceil((COOLDOWN - (now - data.lastAd))/1000) };
           if ((data.dailyCount || 0) >= DAILY_LIMIT) throw { code:'DAILY_LIMIT' };
@@ -369,20 +397,20 @@
           if (newDaily === 10) { bonus = 20; tx.update(ref, { coins: newCoins + bonus }); newCoins += bonus; }
           if (newDaily === 25) { bonus = 50; tx.update(ref, { coins: newCoins + bonus }); newCoins += bonus; }
           if (newDaily === 50) { bonus = 100; tx.update(ref, { coins: newCoins + bonus }); newCoins += bonus; }
-          return { newCoins, daily:newDaily, bonus };
+          return { coins: newCoins, daily: newDaily, bonus };
         });
         pushActivity(`+${COINS_PER_AD} coins (ad)`);
-        if (res && res.bonus) pushActivity(`Daily bonus +${res.bonus}`);
+        if (result && result.bonus) pushActivity(`Daily bonus +${result.bonus}`);
         levelUp();
-      } catch (e) {
-        if (e && e.code === 'COOLDOWN') alert('Please wait '+e.wait+'s');
-        else if (e && e.code === 'DAILY_LIMIT') alert('Daily limit reached');
-        else { console.error(e); alert('Ad reward failed'); }
+      } catch (err) {
+        if (err && err.code === 'COOLDOWN') alert('Please wait '+err.wait+'s before watching another ad.');
+        else if (err && err.code === 'DAILY_LIMIT') alert('Daily ad limit reached.');
+        else { console.error(err); alert('Ad reward failed.'); }
       }
-    }, AD_VIEW_MS + 500);
+    }, AD_VIEW_MS + 400);
   });
 
-  // Offer button small reward
+  // offer button small reward
   document.getElementById('btn-offer').addEventListener('click', () => {
     if (!currentUser) { alert('Sign in first'); return; }
     const url = DIRECTS[Math.floor(Math.random()*DIRECTS.length)];
@@ -392,7 +420,7 @@
     levelUp();
   });
 
-  // Claim streak (transaction)
+  // claim daily streak (transactional)
   claimStreakBtn.addEventListener('click', async () => {
     if (!currentUser) { alert('Sign in first'); return; }
     try {
@@ -410,7 +438,7 @@
         tx.update(ref, { coins: firebase.firestore.FieldValue.increment(bonus), streakCount: streak, lastClaim: firebase.firestore.FieldValue.serverTimestamp() });
       });
       pushActivity('Claimed daily bonus');
-      streakMsg.textContent = 'Bonus claimed 🎉';
+      streakMsg.textContent = 'Bonus claimed! 🎉';
       levelUp();
     } catch (e) {
       if (e && e.code === 'ALREADY') streakMsg.textContent = 'Already claimed today';
@@ -420,7 +448,7 @@
 
   // Redeem
   document.querySelectorAll('.redeem-btn').forEach(btn => {
-    btn.addEventListener('click', async ev => {
+    btn.addEventListener('click', async (ev) => {
       if (!currentUser) { alert('Sign in first'); return; }
       const parent = ev.target.closest('.reward');
       const rewardId = parent.getAttribute('data-id');
@@ -448,7 +476,7 @@
     });
   });
 
-  // Ads injection if live
+  // inject ads (only on live host)
   function createPlaceholder(){
     const w = document.createElement('div'); w.className='ad-slot card';
     w.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center"><div class="ad-label muted">Sponsored • 320×50</div><div style="margin-top:8px;width:320px;height:50px;border-radius:8px;background:linear-gradient(90deg,var(--gold-1),var(--neon-2));display:grid;place-items:center;font-weight:800;color:#2b1b00">Ad</div></div>`;
@@ -457,6 +485,7 @@
 
   function injectAds(){
     if (location.hostname === 'localhost' || location.hostname === '') {
+      // placeholders for local testing
       for (let i=0;i<4;i++) midAds.appendChild(createPlaceholder());
       for (let i=0;i<3;i++) railAds.appendChild(createPlaceholder());
       for (let i=0;i<3;i++) bottomAds.appendChild(createPlaceholder());
@@ -464,19 +493,19 @@
       return;
     }
 
-    // Top native (provided)
+    // top native script (your provided)
     const topScript = document.createElement('script');
     topScript.async = true; topScript.setAttribute('data-cfasync','false');
-    topScript.src = '//pl27363242.profitableratecpm.com/321b2d611b0c8db166ec76303f1333a3/invoke.js';
+    topScript.src = 'https://pl27363242.profitableratecpm.com/321b2d611b0c8db166ec76303f1333a3/invoke.js';
     nativeTopContainer.appendChild(topScript);
 
-    // 320x50 repeated (atOptions)
+    // create repeated 320x50 units using atOptions + invoke.js (your key)
     function addReal320(target){
       const wrapper = document.createElement('div'); wrapper.className='ad-slot card';
       wrapper.innerHTML = `<div class="ad-label muted">Sponsored • 320×50</div>
         <div style="margin-top:8px">
           <script>window.atOptions={'key':'1f337db27a0d5b62ae02902a6ad75bd1','format':'iframe','height':50,'width':320,'params':{}};<\/script>
-          <script async src="//www.highperformanceformat.com/1f337db27a0d5b62ae02902a6ad75bd1/invoke.js"><\/script>
+          <script async src="https://www.highperformanceformat.com/1f337db27a0d5b62ae02902a6ad75bd1/invoke.js"><\/script>
         </div>`;
       target.appendChild(wrapper);
     }
@@ -486,16 +515,19 @@
     for (let i=0;i<3;i++) addReal320(bottomAds);
 
     sticky.innerHTML = `<div class="card ad-slot" style="padding:8px"><div class="ad-label muted">Sticky • 320×50</div>
-      <script>window.atOptions={'key':'1f337db27a0d5b62ae02902a6ad75bd1','format':'iframe','height':50,'width':320,'params':{}};<\/script>
-      <script async src="//www.highperformanceformat.com/1f337db27a0d5b62ae02902a6ad75bd1/invoke.js"><\/script></div>`;
+      <div style="margin-top:8px">
+        <script>window.atOptions={'key':'1f337db27a0d5b62ae02902a6ad75bd1','format':'iframe','height':50,'width':320,'params':{}};<\/script>
+        <script async src="https://www.highperformanceformat.com/1f337db27a0d5b62ae02902a6ad75bd1/invoke.js"><\/script>
+      </div></div>`;
 
-    // Popunder script (load once)
-    const p = document.createElement('script'); p.src='//pl27388614.profitableratecpm.com/ed/e1/b3/ede1b3be0ceadee0f16491a8d7a25b96.js'; p.async=true; document.body.appendChild(p);
+    // load popunder script (safe to load once)
+    const pop = document.createElement('script'); pop.src = 'https://pl27388614.profitableratecpm.com/ed/e1/b3/ede1b3be0ceadee0f16491a8d7a25b96.js'; pop.async = true; document.body.appendChild(pop);
   }
 
-  injectAds();
+  // call injection after a short delay so Firebase has a moment to initialize
+  setTimeout(injectAds, 1200);
 
-  // small helper to prevent text selection weirdness on mobile
+  // small preventive touch
   document.addEventListener('touchstart', ()=>{}, {passive:true});
   </script>
 </body>
