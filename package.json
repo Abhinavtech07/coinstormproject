@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "static": "serve public"
+    "static": "serve public",
+    "build": "echo 'No build necessary for static site'"
   },
   "keywords": [],
   "author": "",
