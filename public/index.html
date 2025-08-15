@@ -1,534 +1,283 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>CoinStorm — Earn & Redeem</title>
-  <meta name="description" content="Watch ads, earn coins, redeem rewards. Google Sign-in & Firestore backed." />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-  <style>
-  :root{
-    --navy:#061025;
-    --card:#ffffff;
-    --muted:#98a0b3;
-    --gold-1:#ffd166;
-    --gold-2:#ff9f1c;
-    --neon-1:#7c3aed;
-    --neon-2:#4f46e5;
-    --radius:14px;
-    --maxw:1120px;
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%;margin:0;font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial;color:#071028;background:linear-gradient(180deg,#f6f8fb,#eef4ff)}
-  .bg-blobs{position:fixed;inset:0;z-index:-2;pointer-events:none;background:
-    radial-gradient(800px 400px at 6% 8%, rgba(255,209,102,0.12), transparent 10%),
-    radial-gradient(700px 360px at 92% 24%, rgba(124,58,237,0.09), transparent 8%),
-    radial-gradient(900px 420px at 50% 92%, rgba(79,70,229,0.06), transparent 6%);filter:blur(22px);animation:bgFloat 18s linear infinite;}
-  @keyframes bgFloat{0%{transform:translateY(0)}50%{transform:translateY(8px)}100%{transform:translateY(0)}}
-
-  .container{max-width:var(--maxw);margin:20px auto;padding:0 18px}
-  .topbar{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:12px;background:linear-gradient(90deg,var(--neon-2),var(--neon-1));color:#fff;box-shadow:0 10px 30px rgba(79,70,229,0.12)}
-  .brand .title{font-weight:800;font-size:20px}
-  .brand .sub{font-size:12px;opacity:.95}
-  .chip{background:rgba(255,255,255,0.12);padding:8px 12px;border-radius:999px;font-weight:700}
-
-  .grid{display:grid;grid-template-columns:2fr 360px;gap:18px;align-items:start}
-  @media(max-width:980px){.grid{grid-template-columns:1fr}}
-
-  .card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:0 16px 40px rgba(18,24,40,0.06);border:1px solid rgba(10,16,34,0.03)}
-  .muted{color:var(--muted);font-size:13px}
-
-  .coins-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
-  .balance{display:flex;align-items:center;gap:14px}
-  .coin-badge{width:68px;height:68px;border-radius:16px;background:linear-gradient(135deg,var(--gold-1),var(--gold-2));display:grid;place-items:center;font-weight:900;font-size:26px;color:#2b1800;box-shadow:0 16px 40px rgba(255,160,30,0.12)}
-  .balance-value{font-size:34px;font-weight:800}
-  .actions{display:flex;gap:10px;flex-wrap:wrap}
-
-  .btn{padding:10px 14px;border-radius:12px;border:0;cursor:pointer;font-weight:800}
-  .btn-primary{background:linear-gradient(90deg,var(--gold-1),var(--gold-2));color:#2b1800;box-shadow:0 12px 28px rgba(255,160,30,0.12)}
-  .btn-accent{background:linear-gradient(90deg,var(--neon-1),var(--neon-2));color:#fff;box-shadow:0 12px 28px rgba(79,70,229,0.12)}
-  .btn-ghost{background:transparent;border:1px solid rgba(10,16,34,0.06);color:#0b1220}
-
-  .pulse{animation:pulse 1.6s infinite}
-  @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
-
-  .progress-wrap{margin-top:14px}
-  .progress-outer{height:16px;background:linear-gradient(90deg,#f4f6fb,#fff);border-radius:12px;padding:2px}
-  .progress-inner{height:100%;width:0;border-radius:10px;background:linear-gradient(90deg,var(--gold-2),var(--neon-2));position:relative;overflow:hidden;transition:width .8s cubic-bezier(.2,.9,.2,1)}
-  .progress-inner::after{content:"";position:absolute;left:-40%;top:0;width:40%;height:100%;background:linear-gradient(90deg,rgba(255,255,255,0.45),rgba(255,255,255,0.02));transform:skewX(-25deg);animation:shine 2s linear infinite}
-  @keyframes shine{0%{left:-40%}100%{left:120%}}
-
-  .ad-slot{border-radius:12px;padding:10px;background:linear-gradient(180deg,rgba(255,255,255,0.94),rgba(255,255,255,0.92));display:flex;align-items:center;justify-content:center;min-height:90px;border:1px solid rgba(15,20,40,0.03)}
-  .ad-label{font-size:12px;color:var(--muted);margin-bottom:6px}
-
-  .ads-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:12px}
-  .rewards{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
-  .reward{flex:0 0 150px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#fffdf7,#fff8ee);text-align:center;box-shadow:0 8px 22px rgba(255,160,30,0.06)}
-  .reward .title{font-weight:800}
-  .reward .cost{color:var(--muted);font-size:13px}
-
-  .activity{margin-top:12px}
-  .activity-item{background:#fff;padding:10px;border-radius:10px;margin-bottom:8px;border:1px solid #f2f0ef;font-size:13px}
-
-  .fire{display:inline-block;width:18px;height:18px;border-radius:6px;background:linear-gradient(90deg,#ff6a00,#ffbf00);box-shadow:0 6px 18px rgba(255,120,20,0.12);margin-left:8px;animation:firebounce 1.6s infinite}
-  @keyframes firebounce{0%{transform:translateY(0)}50%{transform:translateY(-4px)}100%{transform:translateY(0)}}
-
-  .fadein{animation:fadeIn .45s ease both}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-  .confetti{position:fixed;width:9px;height:9px;border-radius:2px;top:0;opacity:0.95;z-index:20000;pointer-events:none}
-  .preloader-wrap{position:fixed;inset:0;background:linear-gradient(180deg,rgba(6,20,40,0.85),rgba(6,14,26,0.7));display:flex;align-items:center;justify-content:center;z-index:99999;flex-direction:column;color:#fff}
-  .spinner-coin{width:96px;height:96px;border-radius:18px;background:conic-gradient(#ffd166,#ff9f1c,#7c3aed);display:grid;place-items:center;font-size:28px;box-shadow:0 20px 60px rgba(0,0,0,0.4);animation:spin 1.8s linear infinite}
-  @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-  .preloader-text{margin-top:12px;opacity:0.95}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚡ CoinStorm - Premium Rewards</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<style>
+:root {
+    --gold: #FFD700;
+    --neon: #8A2BE2;
+    --navy: #1F3A93;
+    --accent: #00FFFF;
+    --light: #F5F6FA;
+}
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, var(--neon), var(--navy));
+    color: var(--light);
+    margin:0;
+    padding:0;
+}
+.container {max-width:900px;margin:0 auto;padding:20px;text-align:center;}
+header {display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.logo {font-size:28px;font-weight:700;color:var(--gold);}
+.user-profile {display:flex;align-items:center;gap:10px;}
+.profile-pic {width:40px;height:40px;border-radius:50%;background:var(--accent);display:grid;place-items:center;font-weight:bold;}
+.main-card {background: rgba(255,255,255,0.05);backdrop-filter:blur(10px);border-radius:20px;padding:30px;box-shadow:0 10px 30px rgba(0,0,0,0.3);margin-bottom:30px;}
+.coin-display {font-size:48px;font-weight:700;margin:20px 0;display:flex;justify-content:center;align-items:center;gap:10px;}
+.coin-icon {width:40px;height:40px;background:url('https://cdn-icons-png.flaticon.com/512/3132/3132693.png') center/cover;filter:drop-shadow(0 0 10px gold);}
+.ad-button {background:linear-gradient(to right,var(--accent),#55efc4);color:white;border:none;padding:15px 40px;font-size:18px;border-radius:50px;cursor:pointer;transition:all 0.3s;box-shadow:0 5px 15px rgba(0,206,201,0.4);font-weight:600;margin:20px 0;}
+.ad-button:hover {transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,206,201,0.6);}
+.ad-button:disabled {background:#b2bec3;cursor:not-allowed;}
+.timer {font-size:14px;color:rgba(255,255,255,0.8);margin-top:10px;}
+.features {display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin:30px 0;}
+.feature-card {background: rgba(255,255,255,0.05);border-radius:15px;padding:20px;transition:all 0.3s;}
+.feature-card:hover {transform:translateY(-5px);background: rgba(255,255,255,0.1);}
+.feature-icon {font-size:30px;margin-bottom:10px;}
+.progress-container {width:100%;background: rgba(255,255,255,0.05);border-radius:10px;margin:20px 0;overflow:hidden;}
+.progress-bar {height:10px;background:linear-gradient(to right,var(--gold),var(--accent));width:0%;transition:width 0.5s ease;border-radius:10px;}
+.tab-container {display:flex;justify-content:center;margin:20px 0;}
+.tab {padding:10px 20px;background: rgba(255,255,255,0.05);border-radius:30px;margin:0 10px;cursor:pointer;transition:all 0.3s;}
+.tab.active {background:var(--accent);font-weight:600;}
+.tab-content {display:none;animation:fadeIn 0.5s ease;}
+.tab-content.active {display:block;}
+.leaderboard {width:100%;border-collapse:collapse;}
+.leaderboard th,.leaderboard td{padding:12px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1);}
+.leaderboard tr:hover{background: rgba(255,255,255,0.05);}
+.rank-1 {color:var(--gold);font-weight:bold;}
+.rank-2 {color:silver;}
+.rank-3 {color:#cd7f32;}
+.notification {position:fixed;top:20px;right:20px;background:var(--accent);color:white;padding:15px 25px;border-radius:10px;box-shadow:0 5px 15px rgba(0,0,0,0.2);transform:translateX(200%);transition:transform 0.3s ease;z-index:1000;}
+.notification.show{transform:translateX(0);}
+footer{margin-top:50px;padding:20px;font-size:14px;color:rgba(255,255,255,0.6);}
+.ad-placeholder{margin:20px 0;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+</style>
 </head>
 <body>
-  <div class="bg-blobs" aria-hidden="true"></div>
+<div class="container">
+<header>
+<div class="logo">⚡ CoinStorm</div>
+<div class="user-profile">
+<div class="profile-pic" id="user-initial">G</div>
+<span id="username">GoldenChampion81</span>
+<button id="signout-btn" style="margin-left:10px;padding:5px 10px;">Sign Out</button>
+</div>
+</header>
 
-  <!-- Preloader -->
-  <div id="preloader" class="preloader-wrap" aria-hidden="false">
-    <div class="spinner-coin">💰</div>
-    <div class="preloader-text">CoinStorm is loading…</div>
-  </div>
+<div class="main-card">
+<h1>💰 Watch Ads, Earn Coins!</h1>
+<div class="coin-display"><div class="coin-icon"></div><span id="coins">0</span></div>
+<div class="progress-container"><div class="progress-bar" id="daily-progress"></div></div>
+<p>Daily progress: <span id="daily-count">0</span>/50 ads</p>
+<button class="ad-button" id="ad-button">▶ Watch Ad (+10 Coins)</button>
+<div class="timer" id="timer"></div>
 
-  <!-- Top bar -->
-  <header class="topbar" role="banner">
-    <div class="brand">
-      <div class="title">⚡ CoinStorm</div>
-      <div class="sub">Trusted rewards • Gold • Navy • Neon</div>
-    </div>
-    <div style="display:flex;align-items:center;gap:10px">
-      <div id="user-chip" class="chip" style="color:#fff">Not signed in</div>
-      <button id="btn-signin" class="btn btn-primary">Sign in (Google)</button>
-      <button id="btn-signout" class="btn btn-ghost" style="display:none">Sign out</button>
-    </div>
-  </header>
+<!-- Banner Ads -->
+<div class="ad-placeholder">
+<script async data-cfasync="false" src="//pl27363242.profitableratecpm.com/321b2d611b0c8db166ec76303f1333a3/invoke.js"></script>
+<div id="container-321b2d611b0c8db166ec76303f1333a3"></div>
+</div>
+<div class="ad-placeholder">
+<script type='text/javascript' src='//pl27388614.profitableratecpm.com/ed/e1/b3/ede1b3be0ceadee0f16491a8d7a25b96.js'></script>
+</div>
+<div class="ad-placeholder">
+<script type="text/javascript">
+atOptions = {
+'key' : '1f337db27a0d5b62ae02902a6ad75bd1',
+'format' : 'iframe',
+'height' : 50,
+'width' : 320,
+'params' : {}
+};
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/1f337db27a0d5b62ae02902a6ad75bd1/invoke.js"></script>
+</div>
+</div>
 
-  <main class="container" role="main">
-    <!-- Top native ad -->
-    <section id="native-top" class="card ad-slot fadein">
-      <div style="text-align:center;width:100%">
-        <div class="ad-label">Sponsored</div>
-        <div id="native-top-container" style="margin-top:8px">Ad area</div>
-      </div>
-    </section>
+<div class="features">
+<div class="feature-card">
+<div class="feature-icon">🔥</div>
+<h3>Daily Streak</h3>
+<p id="streak-count">0 days</p>
+</div>
+<div class="feature-card">
+<div class="feature-icon">🎁</div>
+<h3>Daily Bonus</h3>
+<p id="daily-bonus">Claim now!</p>
+</div>
+<div class="feature-card">
+<div class="feature-icon">👥</div>
+<h3>Refer Friends</h3>
+<p id="referral-count">0 friends</p>
+</div>
+</div>
 
-    <section class="grid" style="margin-top:14px">
-      <div>
-        <div class="card fadein">
-          <div class="coins-row">
-            <div class="balance">
-              <div class="coin-badge">💰</div>
-              <div>
-                <div class="muted">Balance</div>
-                <div id="coins" class="balance-value">0</div>
-              </div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-end">
-              <div style="display:flex;align-items:center;gap:10px">
-                <div class="muted">Streak</div>
-                <div id="streak-count" style="font-weight:900">0</div>
-                <div class="fire" title="Daily Streak"></div>
-              </div>
-              <div class="actions">
-                <button id="btn-watch" class="btn btn-primary pulse">▶ Watch Ad (+10)</button>
-                <button id="btn-offer" class="btn btn-accent">Open Offer</button>
-              </div>
-            </div>
-          </div>
+<div class="tab-container">
+<div class="tab active" data-tab="leaderboard">Leaderboard</div>
+<div class="tab" data-tab="rewards">Redeem</div>
+<div class="tab" data-tab="history">History</div>
+</div>
 
-          <div class="progress-wrap fadein">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px">
-              <div>Level <strong id="level">1</strong></div>
-              <div class="muted" id="progress-text">0 / 100</div>
-            </div>
-            <div class="progress-outer" style="margin-top:8px"><div id="progress-fill" class="progress-inner" style="width:0%"></div></div>
-          </div>
-        </div>
+<div class="tab-content active" id="leaderboard">
+<h2>Top Earners</h2>
+<table class="leaderboard">
+<thead><tr><th>Rank</th><th>Username</th><th>Coins</th></tr></thead>
+<tbody id="leaderboard-body"></tbody>
+</table>
+</div>
 
-        <!-- mid ad grid -->
-        <div id="mid-ads" class="ads-grid" style="margin-top:12px"></div>
+<div class="tab-content" id="rewards">
+<h2>Redeem Your Coins</h2>
+<div class="features">
+<div class="feature-card"><h3>Google Play ₹10</h3><p>500 Coins</p><button class="ad-button">Redeem</button></div>
+<div class="feature-card"><h3>Amazon ₹50</h3><p>2500 Coins</p><button class="ad-button">Redeem</button></div>
+<div class="feature-card"><h3>PayPal ₹200</h3><p>10000 Coins</p><button class="ad-button">Redeem</button></div>
+</div>
+</div>
 
-        <!-- rewards -->
-        <div class="card fadein" style="margin-top:12px">
-          <h3 style="margin:0 0 8px">Redeem</h3>
-          <div class="rewards">
-            <div class="reward" data-id="gp10" data-cost="500">
-              <div class="title">Google Play ₹10</div>
-              <div class="cost muted">Cost: 500 coins</div>
-              <button class="btn btn-primary redeem-btn" style="margin-top:8px">Redeem</button>
-              <div class="code muted" style="margin-top:8px;display:none"></div>
-            </div>
-            <div class="reward" data-id="am50" data-cost="2500">
-              <div class="title">Amazon ₹50</div>
-              <div class="cost muted">Cost: 2500 coins</div>
-              <button class="btn btn-primary redeem-btn" style="margin-top:8px">Redeem</button>
-              <div class="code muted" style="margin-top:8px;display:none"></div>
-            </div>
-            <div class="reward" data-id="pp200" data-cost="10000">
-              <div class="title">PayPal ₹200</div>
-              <div class="cost muted">Cost: 10000 coins</div>
-              <button class="btn btn-primary redeem-btn" style="margin-top:8px">Redeem</button>
-              <div class="code muted" style="margin-top:8px;display:none"></div>
-            </div>
-          </div>
-        </div>
+<div class="tab-content" id="history">
+<h2>Your Activity</h2>
+<div id="activity-list"></div>
+</div>
 
-        <div class="card fadein activity" style="margin-top:12px">
-          <h3 style="margin:0 0 8px">Activity</h3>
-          <div id="activity-list" class="activity-list"></div>
-        </div>
-      </div>
+<footer>© 2025 CoinStorm — Virtual rewards only</footer>
+</div>
 
-      <!-- right rail -->
-      <aside>
-        <div class="card fadein">
-          <h4 style="margin:0 0 8px">Hot Offers</h4>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <a id="offer-1" class="btn btn-ghost" href="#" target="_blank">🔥 Offer 1</a>
-            <a id="offer-2" class="btn btn-ghost" href="#" target="_blank">💎 Offer 2</a>
-            <a id="offer-3" class="btn btn-ghost" href="#" target="_blank">⚡ Offer 3</a>
-          </div>
-        </div>
+<div class="notification" id="notification">+10 Coins Added!</div>
+<audio id="coin-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" preload="auto"></audio>
 
-        <div class="card fadein" style="margin-top:12px">
-          <h4 style="margin:0 0 8px">Sponsored</h4>
-          <div id="rail-ads" style="display:flex;flex-direction:column;gap:10px"></div>
-        </div>
+<script>
+// Firebase configuration
+const firebaseConfig = {
+apiKey: "AIzaSyA7qDhpWxGQKgRGMK7MGjT2MBZF1EAGfLI",
+authDomain: "netlify-a7bd7.firebaseapp.com",
+projectId: "netlify-a7bd7",
+storageBucket: "netlify-a7bd7.appspot.com",
+messagingSenderId: "241532446970",
+appId: "1:241532446970:web:f5698380d476fdd8044143",
+measurementId: "G-CCL8SEG1Q3"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-        <div class="card fadein" style="margin-top:12px">
-          <h4 style="margin:0 0 8px">Daily Streak</h4>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div>Days: <strong id="streak-side">0</strong></div>
-          </div>
-          <button id="claim-streak" class="btn" style="margin-top:10px;background:linear-gradient(90deg,#ffbf66,#ff9f3b)">Claim Bonus</button>
-          <div id="streak-msg" class="muted" style="margin-top:8px"></div>
-        </div>
-      </aside>
-    </section>
+// App state
+let coins = parseInt(localStorage.getItem('coins')) || 0;
+let lastAdTime = parseInt(localStorage.getItem('lastAdTime')) || 0;
+let dailyAdCount = parseInt(localStorage.getItem('dailyAdCount')) || 0;
+let streak = parseInt(localStorage.getItem('streak')) || 0;
+let lastLoginDate = localStorage.getItem('lastLoginDate') || '';
+let today = new Date().toDateString();
 
-    <div id="bottom-ads" class="ads-grid" style="margin-top:12px"></div>
+const coinsDisplay = document.getElementById('coins');
+const adButton = document.getElementById('ad-button');
+const timerDisplay = document.getElementById('timer');
+const dailyProgress = document.getElementById('daily-progress');
+const dailyCountDisplay = document.getElementById('daily-count');
+const streakDisplay = document.getElementById('streak-count');
+const notification = document.getElementById('notification');
+const coinSound = document.getElementById('coin-sound');
+const leaderboardBody = document.getElementById('leaderboard-body');
 
-    <div class="card" style="margin-top:18px;text-align:center">
-      <div class="muted">© <span id="year"></span> CoinStorm — Virtual rewards only</div>
-    </div>
-  </main>
+// Initialize UI
+updateUI();
+checkDailyStreak();
+generateLeaderboard();
 
-  <div id="sticky" class="sticky"></div>
+function updateUI() {
+    coinsDisplay.textContent = coins;
+    dailyCountDisplay.textContent = dailyAdCount;
+    dailyProgress.style.width = `${(dailyAdCount/50)*100}%`;
+    streakDisplay.textContent = `${streak} day${streak!==1?'s':''}`;
+}
 
-  <!-- Firebase compat SDKs (drop-in) -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-  <script>
-  // ------------------ YOUR FIREBASE CONFIG (provided) ------------------
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyA7qDhpWxGQKgRGMK7MGjT2MBZF1EAGfLI",
-    authDomain: "netlify-a7bd7.firebaseapp.com",
-    projectId: "netlify-a7bd7",
-    storageBucket: "netlify-a7bd7.firebasestorage.app",
-    messagingSenderId: "241532446970",
-    appId: "1:241532446970:web:f5698380d476fdd8044143",
-    measurementId: "G-CCL8SEG1Q3"
-  };
-
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-  // ---------------------------------------------------------------------
-
-  // DOM refs
-  const preloader = document.getElementById('preloader');
-  const userChip = document.getElementById('user-chip');
-  const btnSignIn = document.getElementById('btn-signin');
-  const btnSignOut = document.getElementById('btn-signout');
-  const coinsEl = document.getElementById('coins');
-  const levelEl = document.getElementById('level');
-  const progressFill = document.getElementById('progress-fill');
-  const progressText = document.getElementById('progress-text');
-  const streakCountEl = document.getElementById('streak-count');
-  const streakSide = document.getElementById('streak-side');
-  const claimStreakBtn = document.getElementById('claim-streak');
-  const streakMsg = document.getElementById('streak-msg');
-  const activityList = document.getElementById('activity-list');
-  const nativeTopContainer = document.getElementById('native-top-container');
-  const midAds = document.getElementById('mid-ads');
-  const railAds = document.getElementById('rail-ads');
-  const bottomAds = document.getElementById('bottom-ads');
-  const sticky = document.getElementById('sticky');
-  const redeemBtns = document.querySelectorAll('.redeem-btn');
-  document.getElementById('year').textContent = new Date().getFullYear();
-
-  // direct offers
-  const DIRECTS = [
-    'https://www.profitableratecpm.com/hte0hzu0v?key=fb45638729e3933cb3d3e10867a09592',
-    'https://www.profitableratecpm.com/i63pbecy1?key=6ca31a0952a0956430a016a37ca0fd57',
-    'https://www.profitableratecpm.com/eszwggg0?key=784e73c7dc4b992d827cc02a85d064b7'
-  ];
-  document.getElementById('offer-1').href = DIRECTS[0];
-  document.getElementById('offer-2').href = DIRECTS[1];
-  document.getElementById('offer-3').href = DIRECTS[2];
-
-  // constants
-  const COINS_PER_AD = 10;
-  const COOLDOWN = 30 * 1000; // 30s
-  const AD_VIEW_MS = 20 * 1000; // 20s simulated
-  const DAILY_LIMIT = 50;
-
-  let currentUser = null;
-  let userUnsub = null;
-
-  // small helper to show activity
-  function pushActivity(text){
-    const el = document.createElement('div'); el.className='activity-item';
-    el.innerHTML = `<div style="font-weight:700">${text}</div><div class="muted" style="margin-top:6px;font-size:12px">${new Date().toLocaleString()}</div>`;
-    activityList.prepend(el);
-  }
-
-  // remove preloader when ready
-  function hidePreloader() {
-    preloader.style.display = 'none';
-  }
-
-  // Sign-in/out
-  btnSignIn.addEventListener('click', () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider).catch(e => alert('Sign in failed: '+e.message));
-  });
-  btnSignOut.addEventListener('click', () => auth.signOut());
-
-  auth.onAuthStateChanged(async user => {
-    if (user) {
-      currentUser = user;
-      userChip.textContent = user.displayName || user.email || 'You';
-      btnSignIn.style.display = 'none'; btnSignOut.style.display = 'inline-block';
-      startUserListener(user.uid);
-    } else {
-      currentUser = null;
-      userChip.textContent = 'Not signed in';
-      btnSignIn.style.display = 'inline-block'; btnSignOut.style.display = 'none';
-      if (userUnsub) { userUnsub(); userUnsub = null; }
-      applyUI({ coins: 0, streakCount: 0 });
+function checkDailyStreak() {
+    if(lastLoginDate!==today){
+        if(new Date(lastLoginDate).getTime()===new Date(today).getTime()-86400000){
+            streak++;
+        }else if(lastLoginDate && lastLoginDate!==today){
+            streak=0;
+        }
+        lastLoginDate=today;
+        localStorage.setItem('lastLoginDate',today);
+        localStorage.setItem('streak',streak);
     }
-    // hide preloader when firebase auth settled
-    hidePreloader();
-  });
+}
 
-  async function startUserListener(uid){
-    const ref = db.collection('users').doc(uid);
-    const snap = await ref.get();
-    if (!snap.exists) {
-      await ref.set({ coins:0, lastAd:0, dailyCount:0, streakCount:0, lastClaim:null, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-    }
-    userUnsub = ref.onSnapshot(snap => {
-      const data = snap.data();
-      if (!data) return;
-      applyUI(data);
+function generateLeaderboard(){
+    const dummyData=[
+        {name:"You",coins:coins,rank:1},
+        {name:"ProUser123",coins:2450,rank:2},
+        {name:"AdMaster",coins:1800,rank:3},
+        {name:"CoinCollector",coins:1200,rank:4},
+        {name:"Newbie",coins:500,rank:5}
+    ];
+    leaderboardBody.innerHTML='';
+    dummyData.forEach(user=>{
+        const row=document.createElement('tr');
+        row.innerHTML=`<td class="rank-${user.rank}">${user.rank}</td><td>${user.name}</td><td>${user.coins}</td>`;
+        leaderboardBody.appendChild(row);
     });
-  }
+}
 
-  function applyUI(data) {
-    coinsEl.textContent = data.coins || 0;
-    streakCountEl.textContent = data.streakCount || 0;
-    streakSide.textContent = data.streakCount || 0;
-    updateLevelUI(data.coins || 0);
-  }
+function showNotification(msg){notification.textContent=msg;notification.classList.add('show');setTimeout(()=>{notification.classList.remove('show');},3000);}
 
-  function updateLevelUI(coins) {
-    const lvl = Math.floor((coins||0)/100) + 1;
-    const prog = (coins||0) % 100;
-    levelEl.textContent = lvl;
-    progressFill.style.width = Math.min(prog,100) + '%';
-    progressText.textContent = `${prog} / 100`;
-    const last = parseInt(localStorage.getItem('cs_lastLevel') || '1');
-    if (lvl > last) { localStorage.setItem('cs_lastLevel', lvl); levelUp(); }
-  }
-
-  function levelUp() {
-    for (let i=0;i<60;i++){
-      const c = document.createElement('div'); c.className='confetti';
-      c.style.left = (Math.random()*100)+'%';
-      c.style.background = `hsl(${Math.random()*360} 85% 60%)`;
-      c.style.animationDuration = (1.2 + Math.random()*1.6)+'s';
-      document.body.appendChild(c); setTimeout(()=>c.remove(), 3000);
+function startAd(){
+    const now=Date.now();
+    const cooldown=30*1000;
+    if(now-lastAdTime<cooldown){
+        const remaining=Math.ceil((cooldown-(now-lastAdTime))/1000);
+        showNotification(`Please wait ${remaining} seconds`);
+        return;
     }
-    try { new Audio('https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3').play().catch(()=>{}); } catch(e){}
-  }
+    if(dailyAdCount>=50){showNotification("Daily limit reached! Come back tomorrow.");return;}
+    adButton.disabled=true;
+    let timeLeft=20;
+    timerDisplay.textContent=`Ad playing... ${timeLeft}s remaining`;
+    const countdownInterval=setInterval(()=>{
+        timeLeft--;timerDisplay.textContent=`Ad playing... ${timeLeft}s remaining`;
+        if(timeLeft<=0){clearInterval(countdownInterval);rewardUser();}
+    },1000);
+}
 
-  // watch ad flow + popunder-once-per-session
-  document.getElementById('btn-watch').addEventListener('click', async () => {
-    if (!currentUser) { alert('Sign in first'); return; }
+function rewardUser(){
+    coins+=10;dailyAdCount++;lastAdTime=Date.now();
+    localStorage.setItem('coins',coins);
+    localStorage.setItem('lastAdTime',lastAdTime);
+    localStorage.setItem('dailyAdCount',dailyAdCount);
+    updateUI();
+    timerDisplay.textContent="Ready for next ad!";
+    adButton.disabled=false;
+    coinSound.play();
+    confetti({particleCount:100,spread:70,origin:{y:0.6}});
+    showNotification("+10 Coins Added!");
+}
 
-    // popunder only once per session
-    if (!sessionStorage.getItem('cs_popunder_shown')) {
-      // open popunder in new tab/window (browser permitting)
-      const pop = window.open('https://www.profitableratecpm.com/hte0hzu0v?key=fb45638729e3933cb3d3e10867a09592', '_blank');
-      if (!pop) alert('Please allow popups for the offer to open.');
-      sessionStorage.setItem('cs_popunder_shown','1');
-    } else {
-      // open random direct offer anyway (non-popunder)
-      window.open(DIRECTS[Math.floor(Math.random()*DIRECTS.length)], '_blank');
-    }
+adButton.addEventListener('click',startAd);
 
-    // UI countdown
-    const btn = document.getElementById('btn-watch'); btn.disabled = true;
-    const orig = btn.textContent; let left = AD_VIEW_MS/1000;
-    const timer = setInterval(()=>{ left--; btn.textContent = `Watching ${left}s`; if (left<=0){ clearInterval(timer); btn.textContent = orig; btn.disabled = false; } }, 1000);
-
-    // after simulated view, award coins via Firestore transaction
-    setTimeout(async () => {
-      try {
-        const result = await db.runTransaction(async tx => {
-          const ref = db.collection('users').doc(currentUser.uid);
-          const snap = await tx.get(ref);
-          if (!snap.exists) throw new Error('User missing');
-          const data = snap.data();
-          const now = Date.now();
-          if ((now - (data.lastAd || 0)) < COOLDOWN) throw { code:'COOLDOWN', wait: Math.ceil((COOLDOWN - (now - data.lastAd))/1000) };
-          if ((data.dailyCount || 0) >= DAILY_LIMIT) throw { code:'DAILY_LIMIT' };
-          const newDaily = (data.dailyCount || 0) + 1;
-          let newCoins = (data.coins || 0) + COINS_PER_AD;
-          tx.update(ref, { coins: newCoins, dailyCount: newDaily, lastAd: now });
-          let bonus = 0;
-          if (newDaily === 10) { bonus = 20; tx.update(ref, { coins: newCoins + bonus }); newCoins += bonus; }
-          if (newDaily === 25) { bonus = 50; tx.update(ref, { coins: newCoins + bonus }); newCoins += bonus; }
-          if (newDaily === 50) { bonus = 100; tx.update(ref, { coins: newCoins + bonus }); newCoins += bonus; }
-          return { coins: newCoins, daily: newDaily, bonus };
-        });
-        pushActivity(`+${COINS_PER_AD} coins (ad)`);
-        if (result && result.bonus) pushActivity(`Daily bonus +${result.bonus}`);
-        levelUp();
-      } catch (err) {
-        if (err && err.code === 'COOLDOWN') alert('Please wait '+err.wait+'s before watching another ad.');
-        else if (err && err.code === 'DAILY_LIMIT') alert('Daily ad limit reached.');
-        else { console.error(err); alert('Ad reward failed.'); }
-      }
-    }, AD_VIEW_MS + 400);
-  });
-
-  // offer button small reward
-  document.getElementById('btn-offer').addEventListener('click', () => {
-    if (!currentUser) { alert('Sign in first'); return; }
-    const url = DIRECTS[Math.floor(Math.random()*DIRECTS.length)];
-    window.open(url,'_blank');
-    db.collection('users').doc(currentUser.uid).update({ coins: firebase.firestore.FieldValue.increment(5) });
-    pushActivity('+5 coins (offer)');
-    levelUp();
-  });
-
-  // claim daily streak (transactional)
-  claimStreakBtn.addEventListener('click', async () => {
-    if (!currentUser) { alert('Sign in first'); return; }
-    try {
-      await db.runTransaction(async tx => {
-        const ref = db.collection('users').doc(currentUser.uid);
-        const snap = await tx.get(ref);
-        const data = snap.data();
-        const last = data.lastClaim ? new Date(data.lastClaim.toDate()).toDateString() : null;
-        const today = new Date().toDateString();
-        if (last === today) throw { code:'ALREADY' };
-        let streak = (data.streakCount || 0);
-        if (last && (new Date(last).getTime() === new Date(today).getTime() - 86400000)) streak++;
-        else streak = 1;
-        const bonus = streak === 1 ? 10 : (streak === 2 ? 20 : 30);
-        tx.update(ref, { coins: firebase.firestore.FieldValue.increment(bonus), streakCount: streak, lastClaim: firebase.firestore.FieldValue.serverTimestamp() });
-      });
-      pushActivity('Claimed daily bonus');
-      streakMsg.textContent = 'Bonus claimed! 🎉';
-      levelUp();
-    } catch (e) {
-      if (e && e.code === 'ALREADY') streakMsg.textContent = 'Already claimed today';
-      else { console.error(e); alert('Claim error'); }
-    }
-  });
-
-  // Redeem
-  document.querySelectorAll('.redeem-btn').forEach(btn => {
-    btn.addEventListener('click', async (ev) => {
-      if (!currentUser) { alert('Sign in first'); return; }
-      const parent = ev.target.closest('.reward');
-      const rewardId = parent.getAttribute('data-id');
-      const cost = parseInt(parent.getAttribute('data-cost'));
-      const name = parent.querySelector('.title').textContent;
-      try {
-        const code = `${rewardId.toUpperCase()}-${Math.random().toString(36).slice(2,10).toUpperCase()}`;
-        await db.runTransaction(async tx => {
-          const ref = db.collection('users').doc(currentUser.uid);
-          const s = await tx.get(ref);
-          const coins = (s.data().coins || 0);
-          if (coins < cost) throw { code:'NOCOINS' };
-          tx.update(ref, { coins: coins - cost });
-          const rref = db.collection('redemptions').doc();
-          tx.set(rref, { uid: currentUser.uid, rewardId, name, cost, code, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-        });
-        parent.querySelector('.code').style.display = 'block';
-        parent.querySelector('.code').textContent = `Code: ${code}`;
-        pushActivity(`Redeemed ${name} • ${code}`);
-        alert(`Redeemed ${name}\nCode: ${code}`);
-      } catch (e) {
-        if (e && e.code === 'NOCOINS') alert('Not enough coins');
-        else { console.error(e); alert('Redeem failed'); }
-      }
+document.querySelectorAll('.tab').forEach(tab=>{
+    tab.addEventListener('click',()=>{
+        document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.tab).classList.add('active');
     });
-  });
+});
 
-  // inject ads (only on live host)
-  function createPlaceholder(){
-    const w = document.createElement('div'); w.className='ad-slot card';
-    w.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center"><div class="ad-label muted">Sponsored • 320×50</div><div style="margin-top:8px;width:320px;height:50px;border-radius:8px;background:linear-gradient(90deg,var(--gold-1),var(--neon-2));display:grid;place-items:center;font-weight:800;color:#2b1b00">Ad</div></div>`;
-    return w;
-  }
+// Random username
+const adjectives=["Golden","Lucky","Smart","Fast","Happy"];
+const nouns=["Champion","Collector","Winner","Master","Hero"];
+const randomName=`${adjectives[Math.floor(Math.random()*adjectives.length)]}${nouns[Math.floor(Math.random()*nouns.length)]}${Math.floor(Math.random()*100)}`;
+document.getElementById('username').textContent=randomName;
+document.getElementById('user-initial').textContent=randomName.charAt(0);
 
-  function injectAds(){
-    if (location.hostname === 'localhost' || location.hostname === '') {
-      // placeholders for local testing
-      for (let i=0;i<4;i++) midAds.appendChild(createPlaceholder());
-      for (let i=0;i<3;i++) railAds.appendChild(createPlaceholder());
-      for (let i=0;i<3;i++) bottomAds.appendChild(createPlaceholder());
-      sticky.innerHTML = `<div class="card ad-slot" style="padding:8px"><div style="height:50px;background:linear-gradient(90deg,var(--gold-1),var(--neon-2));border-radius:8px"></div></div>`;
-      return;
-    }
-
-    // top native script (your provided)
-    const topScript = document.createElement('script');
-    topScript.async = true; topScript.setAttribute('data-cfasync','false');
-    topScript.src = 'https://pl27363242.profitableratecpm.com/321b2d611b0c8db166ec76303f1333a3/invoke.js';
-    nativeTopContainer.appendChild(topScript);
-
-    // create repeated 320x50 units using atOptions + invoke.js (your key)
-    function addReal320(target){
-      const wrapper = document.createElement('div'); wrapper.className='ad-slot card';
-      wrapper.innerHTML = `<div class="ad-label muted">Sponsored • 320×50</div>
-        <div style="margin-top:8px">
-          <script>window.atOptions={'key':'1f337db27a0d5b62ae02902a6ad75bd1','format':'iframe','height':50,'width':320,'params':{}};<\/script>
-          <script async src="https://www.highperformanceformat.com/1f337db27a0d5b62ae02902a6ad75bd1/invoke.js"><\/script>
-        </div>`;
-      target.appendChild(wrapper);
-    }
-
-    for (let i=0;i<4;i++) addReal320(midAds);
-    for (let i=0;i<3;i++) addReal320(railAds);
-    for (let i=0;i<3;i++) addReal320(bottomAds);
-
-    sticky.innerHTML = `<div class="card ad-slot" style="padding:8px"><div class="ad-label muted">Sticky • 320×50</div>
-      <div style="margin-top:8px">
-        <script>window.atOptions={'key':'1f337db27a0d5b62ae02902a6ad75bd1','format':'iframe','height':50,'width':320,'params':{}};<\/script>
-        <script async src="https://www.highperformanceformat.com/1f337db27a0d5b62ae02902a6ad75bd1/invoke.js"><\/script>
-      </div></div>`;
-
-    // load popunder script (safe to load once)
-    const pop = document.createElement('script'); pop.src = 'https://pl27388614.profitableratecpm.com/ed/e1/b3/ede1b3be0ceadee0f16491a8d7a25b96.js'; pop.async = true; document.body.appendChild(pop);
-  }
-
-  // call injection after a short delay so Firebase has a moment to initialize
-  setTimeout(injectAds, 1200);
-
-  // small preventive touch
-  document.addEventListener('touchstart', ()=>{}, {passive:true});
-  </script>
+</script>
 </body>
 </html>
