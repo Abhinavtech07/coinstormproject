@@ -1,285 +1,219 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>⚡ CoinStorm - Premium Rewards</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-<style>
-:root {
-    --gold: #FFD700;
-    --neon: #8A2BE2;
-    --navy: #1F3A93;
-    --accent: #00FFFF;
-    --light: #F5F6FA;
-}
-body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, var(--neon), var(--navy));
-    color: var(--light);
-    margin:0;
-    padding:0;
-}
-.container {max-width:900px;margin:0 auto;padding:20px;text-align:center;}
-header {display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
-.logo {font-size:28px;font-weight:700;color:var(--gold);}
-.user-profile {display:flex;align-items:center;gap:10px;}
-.profile-pic {width:40px;height:40px;border-radius:50%;background:var(--accent);display:grid;place-items:center;font-weight:bold;}
-.main-card {background: rgba(255,255,255,0.05);backdrop-filter:blur(10px);border-radius:20px;padding:30px;box-shadow:0 10px 30px rgba(0,0,0,0.3);margin-bottom:30px;}
-.coin-display {font-size:48px;font-weight:700;margin:20px 0;display:flex;justify-content:center;align-items:center;gap:10px;}
-.coin-icon {width:40px;height:40px;background:url('https://cdn-icons-png.flaticon.com/512/3132/3132693.png') center/cover;filter:drop-shadow(0 0 10px gold);}
-.ad-button {background:linear-gradient(to right,var(--accent),#55efc4);color:white;border:none;padding:15px 40px;font-size:18px;border-radius:50px;cursor:pointer;transition:all 0.3s;box-shadow:0 5px 15px rgba(0,206,201,0.4);font-weight:600;margin:20px 0;}
-.ad-button:hover {transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,206,201,0.6);}
-.ad-button:disabled {background:#b2bec3;cursor:not-allowed;}
-.timer {font-size:14px;color:rgba(255,255,255,0.8);margin-top:10px;}
-.features {display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin:30px 0;}
-.feature-card {background: rgba(255,255,255,0.05);border-radius:15px;padding:20px;transition:all 0.3s;}
-.feature-card:hover {transform:translateY(-5px);background: rgba(255,255,255,0.1);}
-.feature-icon {font-size:30px;margin-bottom:10px;}
-.progress-container {width:100%;background: rgba(255,255,255,0.05);border-radius:10px;margin:20px 0;overflow:hidden;}
-.progress-bar {height:10px;background:linear-gradient(to right,var(--gold),var(--accent));width:0%;transition:width 0.5s ease;border-radius:10px;}
-.tab-container {display:flex;justify-content:center;margin:20px 0;}
-.tab {padding:10px 20px;background: rgba(255,255,255,0.05);border-radius:30px;margin:0 10px;cursor:pointer;transition:all 0.3s;}
-.tab.active {background:var(--accent);font-weight:600;}
-.tab-content {display:none;animation:fadeIn 0.5s ease;}
-.tab-content.active {display:block;}
-.leaderboard {width:100%;border-collapse:collapse;}
-.leaderboard th,.leaderboard td{padding:12px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1);}
-.leaderboard tr:hover{background: rgba(255,255,255,0.05);}
-.rank-1 {color:var(--gold);font-weight:bold;}
-.rank-2 {color:silver;}
-.rank-3 {color:#cd7f32;}
-.notification {position:fixed;top:20px;right:20px;background:var(--accent);color:white;padding:15px 25px;border-radius:10px;box-shadow:0 5px 15px rgba(0,0,0,0.2);transform:translateX(200%);transition:transform 0.3s ease;z-index:1000;}
-.notification.show{transform:translateX(0);}
-footer{margin-top:50px;padding:20px;font-size:14px;color:rgba(255,255,255,0.6);}
-.ad-placeholder{margin:20px 0;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>⚡ CoinStorm Premium</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #111, #000);
+      color: #fff;
+    }
+    h1, h2 { text-align: center; }
+    .container { max-width: 480px; margin: auto; padding: 1rem; }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 0.8rem;
+      margin: 0.5rem 0;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn-purple { background: #7c3aed; color: #fff; }
+    .btn-purple:hover { background: #6d28d9; }
+    .btn-green { background: #16a34a; color: #fff; }
+    .btn-green:disabled { background: #444; cursor: not-allowed; }
+    .btn-yellow { background: #facc15; color: #000; }
+    .card {
+      background: #1f2937;
+      padding: 1rem;
+      border-radius: 12px;
+      margin: 0.8rem 0;
+    }
+    .flex { display: flex; justify-content: space-between; align-items: center; }
+    .history { max-height: 200px; overflow-y: auto; font-size: 0.9rem; }
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      display: flex; justify-content: space-around;
+      background: #111; border-top: 1px solid #333;
+      padding: 0.6rem 0;
+    }
+    .bottom-nav button {
+      background: none; border: none; color: #777; font-size: 1rem; cursor: pointer;
+    }
+    .bottom-nav .active { color: #facc15; font-weight: bold; }
+    .ad-banner { text-align: center; margin: 1rem 0; }
+    .sticky-ad {
+      position: fixed; bottom: 3.5rem; left: 0; right: 0;
+      text-align: center;
+    }
+    img.ad-img { border-radius: 8px; max-width: 95%; }
+  </style>
 </head>
 <body>
-<div class="container">
-<header>
-<div class="logo">⚡ CoinStorm</div>
-<div class="user-profile">
-<div class="profile-pic" id="user-initial">G</div>
-<span id="username">GoldenChampion81</span>
-<button id="signout-btn" style="margin-left:10px;padding:5px 10px;">Sign Out</button>
-</div>
-</header>
+  <div class="container">
+    <h1>⚡ CoinStorm</h1>
+    <p id="balance" style="text-align:center;">💰 Balance: 0</p>
 
-<div class="main-card">
-<h1>💰 Watch Ads, Earn Coins!</h1>
-<div class="coin-display"><div class="coin-icon"></div><span id="coins">0</span></div>
-<div class="progress-container"><div class="progress-bar" id="daily-progress"></div></div>
-<p>Daily progress: <span id="daily-count">0</span>/50 ads</p>
-<button class="ad-button" id="ad-button">▶ Watch Ad (+10 Coins)</button>
-<div class="timer" id="timer"></div>
+    <!-- Tab Contents -->
+    <div id="homeTab" class="tab">
+      <button class="btn btn-purple" onclick="watchAd()">▶ Watch Ad (+10 Coins)</button>
 
-<!-- Banner Ads -->
-<div class="ad-placeholder">
-<script async data-cfasync="false" src="//pl27363242.profitableratecpm.com/321b2d611b0c8db166ec76303f1333a3/invoke.js"></script>
-<div id="container-321b2d611b0c8db166ec76303f1333a3"></div>
-</div>
-<div class="ad-placeholder">
-<script type='text/javascript' src='//pl27388614.profitableratecpm.com/ed/e1/b3/ede1b3be0ceadee0f16491a8d7a25b96.js'></script>
-</div>
-<div class="ad-placeholder">
-<script type="text/javascript">
-atOptions = {
-'key' : '1f337db27a0d5b62ae02902a6ad75bd1',
-'format' : 'iframe',
-'height' : 50,
-'width' : 320,
-'params' : {}
-};
-</script>
-<script type="text/javascript" src="//www.highperformanceformat.com/1f337db27a0d5b62ae02902a6ad75bd1/invoke.js"></script>
-</div>
-</div>
+      <!-- Native Banner Ad -->
+      <div class="ad-banner">
+        <script async="async" data-cfasync="false" src="//pl27363242.profitableratecpm.com/321b2d611b0c8db166ec76303f1333a3/invoke.js"></script>
+        <div id="container-321b2d611b0c8db166ec76303f1333a3"></div>
+      </div>
 
-<div class="features">
-<div class="feature-card">
-<div class="feature-icon">🔥</div>
-<h3>Daily Streak</h3>
-<p id="streak-count">0 days</p>
-</div>
-<div class="feature-card">
-<div class="feature-icon">🎁</div>
-<h3>Daily Bonus</h3>
-<p id="daily-bonus">Claim now!</p>
-</div>
-<div class="feature-card">
-<div class="feature-icon">👥</div>
-<h3>Refer Friends</h3>
-<p id="referral-count">0 friends</p>
-</div>
-</div>
+      <!-- Daily Streak -->
+      <div class="card">
+        <h2>🔥 Daily Streak: <span id="streak">0</span> days</h2>
+        <button id="claimBtn" class="btn btn-green" onclick="claimStreak()">Claim Streak +20</button>
+      </div>
 
-<div class="tab-container">
-<div class="tab active" data-tab="leaderboard">Leaderboard</div>
-<div class="tab" data-tab="rewards">Redeem</div>
-<div class="tab" data-tab="history">History</div>
-</div>
+      <!-- Rewards -->
+      <div class="card">
+        <h2>🎁 Redeem</h2>
+        <div class="flex"><span>Google Play ₹10</span><button class="btn btn-yellow">500 coins</button></div>
+        <div class="flex"><span>Amazon ₹50</span><button class="btn btn-yellow">2500 coins</button></div>
+        <div class="flex"><span>PayPal ₹200</span><button class="btn btn-yellow">10000 coins</button></div>
+      </div>
+    </div>
 
-<div class="tab-content active" id="leaderboard">
-<h2>Top Earners</h2>
-<table class="leaderboard">
-<thead><tr><th>Rank</th><th>Username</th><th>Coins</th></tr></thead>
-<tbody id="leaderboard-body"></tbody>
-</table>
-</div>
+    <div id="referTab" class="tab" style="display:none;">
+      <div class="card">
+        <h2>👥 Refer Friends</h2>
+        <button class="btn btn-purple" onclick="referFriend()">Invite Friend (+50)</button>
+        <p>Referrals: <span id="referrals">0</span></p>
+      </div>
+    </div>
 
-<div class="tab-content" id="rewards">
-<h2>Redeem Your Coins</h2>
-<div class="features">
-<div class="feature-card"><h3>Google Play ₹10</h3><p>500 Coins</p><button class="ad-button">Redeem</button></div>
-<div class="feature-card"><h3>Amazon ₹50</h3><p>2500 Coins</p><button class="ad-button">Redeem</button></div>
-<div class="feature-card"><h3>PayPal ₹200</h3><p>10000 Coins</p><button class="ad-button">Redeem</button></div>
-</div>
-</div>
+    <div id="historyTab" class="tab" style="display:none;">
+      <div class="card">
+        <h2>📜 History</h2>
+        <div id="historyList" class="history"></div>
+      </div>
+    </div>
 
-<div class="tab-content" id="history">
-<h2>Your Activity</h2>
-<div id="activity-list"></div>
-</div>
+    <div id="leaderTab" class="tab" style="display:none;">
+      <div class="card">
+        <h2>🏆 Leaderboard</h2>
+        <p style="text-align:center;color:#999;">Coming soon...</p>
+      </div>
+    </div>
+  </div>
 
-<footer>© 2025 CoinStorm — Virtual rewards only</footer>
-</div>
+  <!-- Sticky Bottom Banner Ad -->
+  <div class="sticky-ad">
+    <script type="text/javascript">
+      atOptions = {
+        'key' : '1f337db27a0d5b62ae02902a6ad75bd1',
+        'format' : 'iframe',
+        'height' : 50,
+        'width' : 320,
+        'params' : {}
+      };
+    </script>
+    <script type="text/javascript" src="//www.highperformanceformat.com/1f337db27a0d5b62ae02902a6ad75bd1/invoke.js"></script>
+  </div>
 
-<div class="notification" id="notification">+10 Coins Added!</div>
-<audio id="coin-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" preload="auto"></audio>
+  <!-- Popunder Ad (one per page) -->
+  <script type='text/javascript' src='//pl27388614.profitableratecpm.com/ed/e1/b3/ede1b3be0ceadee0f16491a8d7a25b96.js'></script>
 
-<script>
-// Firebase configuration
-const firebaseConfig = {
-apiKey: "AIzaSyA7qDhpWxGQKgRGMK7MGjT2MBZF1EAGfLI",
-authDomain: "netlify-a7bd7.firebaseapp.com",
-projectId: "netlify-a7bd7",
-storageBucket: "netlify-a7bd7.appspot.com",
-messagingSenderId: "241532446970",
-appId: "1:241532446970:web:f5698380d476fdd8044143",
-measurementId: "G-CCL8SEG1Q3"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <button id="homeBtn" class="active" onclick="showTab('home')">Home</button>
+    <button id="referBtn" onclick="showTab('refer')">Refer</button>
+    <button id="historyBtn" onclick="showTab('history')">History</button>
+    <button id="leaderBtn" onclick="showTab('leader')">Leaderboard</button>
+  </div>
 
-// App state
-let coins = parseInt(localStorage.getItem('coins')) || 0;
-let lastAdTime = parseInt(localStorage.getItem('lastAdTime')) || 0;
-let dailyAdCount = parseInt(localStorage.getItem('dailyAdCount')) || 0;
-let streak = parseInt(localStorage.getItem('streak')) || 0;
-let lastLoginDate = localStorage.getItem('lastLoginDate') || '';
-let today = new Date().toDateString();
+  <script>
+    let coins = Number(localStorage.getItem("coins")) || 0;
+    let streak = Number(localStorage.getItem("streak")) || 0;
+    let referrals = Number(localStorage.getItem("referrals")) || 0;
+    let history = JSON.parse(localStorage.getItem("history") || "[]");
+    let lastClaim = localStorage.getItem("lastClaim");
 
-const coinsDisplay = document.getElementById('coins');
-const adButton = document.getElementById('ad-button');
-const timerDisplay = document.getElementById('timer');
-const dailyProgress = document.getElementById('daily-progress');
-const dailyCountDisplay = document.getElementById('daily-count');
-const streakDisplay = document.getElementById('streak-count');
-const notification = document.getElementById('notification');
-const coinSound = document.getElementById('coin-sound');
-const leaderboardBody = document.getElementById('leaderboard-body');
+    const balanceEl = document.getElementById("balance");
+    const streakEl = document.getElementById("streak");
+    const referralsEl = document.getElementById("referrals");
+    const historyList = document.getElementById("historyList");
+    const claimBtn = document.getElementById("claimBtn");
 
-// Initialize UI
-updateUI();
-checkDailyStreak();
-generateLeaderboard();
-
-function updateUI() {
-    coinsDisplay.textContent = coins;
-    dailyCountDisplay.textContent = dailyAdCount;
-    dailyProgress.style.width = `${(dailyAdCount/50)*100}%`;
-    streakDisplay.textContent = `${streak} day${streak!==1?'s':''}`;
-}
-
-function checkDailyStreak() {
-    if(lastLoginDate!==today){
-        if(new Date(lastLoginDate).getTime()===new Date(today).getTime()-86400000){
-            streak++;
-        }else if(lastLoginDate && lastLoginDate!==today){
-            streak=0;
-        }
-        lastLoginDate=today;
-        localStorage.setItem('lastLoginDate',today);
-        localStorage.setItem('streak',streak);
+    function updateUI() {
+      balanceEl.textContent = "💰 Balance: " + coins;
+      streakEl.textContent = streak;
+      referralsEl.textContent = referrals;
+      historyList.innerHTML = history.length === 0
+        ? "<p style='color:#777;text-align:center;'>No history yet</p>"
+        : history.map(item => `<div class='flex'><span>${item.action}</span><span style='color:#999'>${item.date}</span></div>`).join("");
+      if (lastClaim === new Date().toDateString()) {
+        claimBtn.disabled = true;
+        claimBtn.textContent = "Already Claimed";
+      }
     }
-}
-
-function generateLeaderboard(){
-    const dummyData=[
-        {name:"You",coins:coins,rank:1},
-        {name:"ProUser123",coins:2450,rank:2},
-        {name:"AdMaster",coins:1800,rank:3},
-        {name:"CoinCollector",coins:1200,rank:4},
-        {name:"Newbie",coins:500,rank:5}
-    ];
-    leaderboardBody.innerHTML='';
-    dummyData.forEach(user=>{
-        const row=document.createElement('tr');
-        row.innerHTML=`<td class="rank-${user.rank}">${user.rank}</td><td>${user.name}</td><td>${user.coins}</td>`;
-        leaderboardBody.appendChild(row);
-    });
-}
-
-function showNotification(msg){notification.textContent=msg;notification.classList.add('show');setTimeout(()=>{notification.classList.remove('show');},3000);}
-
-function startAd(){
-    const now=Date.now();
-    const cooldown=30*1000;
-    if(now-lastAdTime<cooldown){
-        const remaining=Math.ceil((cooldown-(now-lastAdTime))/1000);
-        showNotification(`Please wait ${remaining} seconds`);
-        return;
-    }
-    if(dailyAdCount>=50){showNotification("Daily limit reached! Come back tomorrow.");return;}
-    adButton.disabled=true;
-    let timeLeft=20;
-    timerDisplay.textContent=`Ad playing... ${timeLeft}s remaining`;
-    const countdownInterval=setInterval(()=>{
-        timeLeft--;timerDisplay.textContent=`Ad playing... ${timeLeft}s remaining`;
-        if(timeLeft<=0){clearInterval(countdownInterval);rewardUser();}
-    },1000);
-}
-
-function rewardUser(){
-    coins+=10;dailyAdCount++;lastAdTime=Date.now();
-    localStorage.setItem('coins',coins);
-    localStorage.setItem('lastAdTime',lastAdTime);
-    localStorage.setItem('dailyAdCount',dailyAdCount);
     updateUI();
-    timerDisplay.textContent="Ready for next ad!";
-    adButton.disabled=false;
-    coinSound.play();
-    confetti({particleCount:100,spread:70,origin:{y:0.6}});
-    showNotification("+10 Coins Added!");
-}
 
-adButton.addEventListener('click',startAd);
+    function saveState() {
+      localStorage.setItem("coins", coins);
+      localStorage.setItem("streak", streak);
+      localStorage.setItem("referrals", referrals);
+      localStorage.setItem("history", JSON.stringify(history));
+      localStorage.setItem("lastClaim", lastClaim);
+    }
 
-document.querySelectorAll('.tab').forEach(tab=>{
-    tab.addEventListener('click',()=>{
-        document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
-        tab.classList.add('active');
-        document.getElementById(tab.dataset.tab).classList.add('active');
-    });
-});
+    function addHistory(action) {
+      history.unshift({ action, date: new Date().toLocaleString() });
+      saveState();
+      updateUI();
+    }
 
-// Random username
-const adjectives=["Golden","Lucky","Smart","Fast","Happy"];
-const nouns=["Champion","Collector","Winner","Master","Hero"];
-const randomName=`${adjectives[Math.floor(Math.random()*adjectives.length)]}${nouns[Math.floor(Math.random()*nouns.length)]}${Math.floor(Math.random()*100)}`;
-document.getElementById('username').textContent=randomName;
-document.getElementById('user-initial').textContent=randomName.charAt(0);
+    function watchAd() {
+      const links = [
+        "https://www.profitableratecpm.com/hte0hzu0v?key=fb45638729e3933cb3d3e10867a09592",
+        "https://www.profitableratecpm.com/i63pbecy1?key=6ca31a0952a0956430a016a37ca0fd57",
+        "https://www.profitableratecpm.com/eszwggg0?key=784e73c7dc4b992d827cc02a85d064b7"
+      ];
+      const url = links[Math.floor(Math.random() * links.length)];
+      window.open(url, "_blank");
+      setTimeout(() => {
+        coins += 10;
+        addHistory("Watched Ad +10");
+        updateUI();
+      }, 20000);
+    }
 
-</script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3201100934909470"
-     crossorigin="anonymous"></script>
+    function claimStreak() {
+      if (lastClaim !== new Date().toDateString()) {
+        coins += 20;
+        streak++;
+        lastClaim = new Date().toDateString();
+        addHistory("Daily Streak Claimed +20");
+        saveState();
+        updateUI();
+      }
+    }
+
+    function referFriend() {
+      coins += 50;
+      referrals++;
+      addHistory("Referral +50");
+      saveState();
+      updateUI();
+    }
+
+    function showTab(tab) {
+      document.querySelectorAll(".tab").forEach(t => t.style.display = "none");
+      document.getElementById(tab+"Tab").style.display = "block";
+      document.querySelectorAll(".bottom-nav button").forEach(b => b.classList.remove("active"));
+      document.getElementById(tab+"Btn").classList.add("active");
+    }
+  </script>
 </body>
 </html>
