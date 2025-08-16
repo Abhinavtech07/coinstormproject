@@ -53,6 +53,33 @@
       text-align: center;
     }
     img.ad-img { border-radius: 8px; max-width: 95%; }
+    /* Animation popup */
+    .redeem-popup {
+      position: fixed;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: #16a34a;
+      color: #fff;
+      padding: 1.2rem 1.5rem;
+      border-radius: 12px;
+      font-weight: bold;
+      z-index: 1000;
+      text-align: center;
+      transition: transform 0.3s ease-in-out;
+    }
+    .redeem-popup.show {
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .copy-code {
+      margin-top: 0.5rem;
+      background: #fff;
+      color: #000;
+      padding: 0.3rem 0.6rem;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-block;
+    }
   </style>
 </head>
 <body>
@@ -60,7 +87,7 @@
     <h1>⚡ CoinStorm</h1>
     <p id="balance" style="text-align:center;">💰 Balance: 0</p>
 
-    <!-- Tab Contents -->
+    <!-- Home Tab -->
     <div id="homeTab" class="tab">
       <button class="btn btn-purple" onclick="watchAd()">▶ Watch Ad (+10 Coins)</button>
 
@@ -79,17 +106,12 @@
       <!-- Rewards -->
       <div class="card">
         <h2>🎁 Redeem</h2>
-        <div class="flex"><span>Google Play ₹10</span><button class="btn btn-yellow">500 coins</button></div>
+        <div class="flex">
+          <span>Google Play ₹10</span>
+          <button class="btn btn-yellow" onclick="redeem500()">500 coins</button>
+        </div>
         <div class="flex"><span>Amazon ₹50</span><button class="btn btn-yellow">2500 coins</button></div>
         <div class="flex"><span>PayPal ₹200</span><button class="btn btn-yellow">10000 coins</button></div>
-      </div>
-    </div>
-
-    <div id="referTab" class="tab" style="display:none;">
-      <div class="card">
-        <h2>👥 Refer Friends</h2>
-        <button class="btn btn-purple" onclick="referFriend()">Invite Friend (+50)</button>
-        <p>Referrals: <span id="referrals">0</span></p>
       </div>
     </div>
 
@@ -106,6 +128,13 @@
         <p style="text-align:center;color:#999;">Coming soon...</p>
       </div>
     </div>
+  </div>
+
+  <!-- Redeem Popup -->
+  <div id="redeemPopup" class="redeem-popup">
+    🎉 Redeemed!<br>
+    Code: <span id="redeemCode">GYB8MHK6JL95BH55</span>
+    <div class="copy-code" onclick="copyCode()">Copy</div>
   </div>
 
   <!-- Sticky Bottom Banner Ad -->
@@ -128,7 +157,6 @@
   <!-- Bottom Navigation -->
   <div class="bottom-nav">
     <button id="homeBtn" class="active" onclick="showTab('home')">Home</button>
-    <button id="referBtn" onclick="showTab('refer')">Refer</button>
     <button id="historyBtn" onclick="showTab('history')">History</button>
     <button id="leaderBtn" onclick="showTab('leader')">Leaderboard</button>
   </div>
@@ -136,20 +164,18 @@
   <script>
     let coins = Number(localStorage.getItem("coins")) || 0;
     let streak = Number(localStorage.getItem("streak")) || 0;
-    let referrals = Number(localStorage.getItem("referrals")) || 0;
     let history = JSON.parse(localStorage.getItem("history") || "[]");
     let lastClaim = localStorage.getItem("lastClaim");
 
     const balanceEl = document.getElementById("balance");
     const streakEl = document.getElementById("streak");
-    const referralsEl = document.getElementById("referrals");
     const historyList = document.getElementById("historyList");
     const claimBtn = document.getElementById("claimBtn");
+    const redeemPopup = document.getElementById("redeemPopup");
 
     function updateUI() {
       balanceEl.textContent = "💰 Balance: " + coins;
       streakEl.textContent = streak;
-      referralsEl.textContent = referrals;
       historyList.innerHTML = history.length === 0
         ? "<p style='color:#777;text-align:center;'>No history yet</p>"
         : history.map(item => `<div class='flex'><span>${item.action}</span><span style='color:#999'>${item.date}</span></div>`).join("");
@@ -163,7 +189,6 @@
     function saveState() {
       localStorage.setItem("coins", coins);
       localStorage.setItem("streak", streak);
-      localStorage.setItem("referrals", referrals);
       localStorage.setItem("history", JSON.stringify(history));
       localStorage.setItem("lastClaim", lastClaim);
     }
@@ -200,12 +225,22 @@
       }
     }
 
-    function referFriend() {
-      coins += 50;
-      referrals++;
-      addHistory("Referral +50");
-      saveState();
-      updateUI();
+    function redeem500() {
+      if (coins >= 500) {
+        coins -= 500;
+        addHistory("Redeemed 500 Coins for Google Play");
+        updateUI();
+        // Show popup
+        redeemPopup.classList.add("show");
+        setTimeout(() => redeemPopup.classList.remove("show"), 4000);
+      } else {
+        alert("Not enough coins!");
+      }
+    }
+
+    function copyCode() {
+      navigator.clipboard.writeText("GYB8MHK6JL95BH55");
+      alert("Code copied!");
     }
 
     function showTab(tab) {
@@ -217,5 +252,71 @@
   </script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3201100934909470"
   crossorigin="anonymous"></script>
+  <style>
+    /* Redeem popup with fade + scale animation */
+    .redeem-popup {
+      position: fixed;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.5);
+      background: #16a34a;
+      color: #fff;
+      padding: 1.2rem 1.5rem;
+      border-radius: 12px;
+      font-weight: bold;
+      z-index: 1000;
+      text-align: center;
+      opacity: 0;
+      transition: transform 0.4s ease, opacity 0.4s ease;
+    }
+    .redeem-popup.show {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+    .copy-code {
+      margin-top: 0.5rem;
+      background: #fff;
+      color: #000;
+      padding: 0.3rem 0.6rem;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-block;
+      transition: background 0.2s;
+    }
+    .copy-code:hover {
+      background: #facc15;
+      color: #000;
+    }
+  </style>
+  
+  <div id="redeemPopup" class="redeem-popup">
+    🎉 Redeemed!<br>
+    Code: <span id="redeemCode">GYB8MHK6JL95BH55</span>
+    <div class="copy-code" onclick="copyCode()">Copy</div>
+  </div>
+  
+  <script>
+  function redeem500() {
+    if (coins >= 500) {
+      coins -= 500;
+      addHistory("Redeemed 500 Coins for Google Play");
+      updateUI();
+  
+      // Show popup with smooth animation
+      redeemPopup.classList.add("show");
+      setTimeout(() => {
+        redeemPopup.classList.remove("show");
+      }, 4000); // popup stays for 4 seconds
+    } else {
+      alert("Not enough coins!");
+    }
+  }
+  
+  function copyCode() {
+    navigator.clipboard.writeText("GYB8MHK6JL95BH55");
+    alert("Code copied!");
+  }
+  </script>
+  
 </body>
 </html>
